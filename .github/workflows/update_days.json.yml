@@ -1,33 +1,41 @@
-name: Update Days Since March 31, 2020 in JSON
+name: Update Days and Compute Difference
 
 on:
   schedule:
-    # Runs at 00:01 UTC
     - cron: '1 0 * * *'
   workflow_dispatch:
 
 jobs:
-  update-days-json:
+  update-info:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      # Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v2
-      
-      # Calculate the days and update the JSON file
-      - name: Update days in JSON file
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Compute days since March 31, 2020
         run: |
           DAYS=$(( ( $(date -u +%s) - $(date -ud '2020-03-31' +%s) ) / 86400 ))
-          sed -i "s/\"PLACEHOLDER\"/\"$DAYS\"/g" days_since.json
-      
-      # Commit and push the changes
+          echo "DAYS=$DAYS" >> $GITHUB_ENV
+
+      - name: Fetch latest tag from another repo
+        run: |
+          TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/gardenlinux/gardenlinux/tags | jq -r '.[0].name')
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Compute difference
+        run: |
+          DIFF=$(( $DAYS - $TAG ))
+          echo "Difference between days since March 31, 2020, and the latest tag is: $DIFF"
+
       - name: Commit and push
         run: |
           git config --global user.name 'Andreas Fritzler'
           git config --global user.email '1922939+afritzler@users.noreply.github.com'
-          git add days_since.json
-          git commit -m "Update days count in JSON"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "{\"days_since_march\": $DAYS, \"latest_tag\": $TAG, \"difference\": $DIFF}" > info.json
+          git add info.json
+          git commit -m "Update information"
+          git push origin main
