@@ -21,9 +21,9 @@ jobs:
           DAYS=$(( ( $(date -u +%s) - $(date -ud '2020-03-31' +%s) ) / 86400 ))
           echo "DAYS=$DAYS" >> $GITHUB_ENV
 
-      - name: Fetch latest tag from another repo
+      - name: Fetch latest numeric tag from another repo
         run: |
-          TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/gardenlinux/gardenlinux/tags | jq -r '.[0].name')
+          TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/gardenlinux/gardenlinux/tags | jq -r 'map(select(.name | test("^[0-9]"))) | .[0].name')
           echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Compute difference
