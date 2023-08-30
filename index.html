@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Days Since March 31, 2020</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f2f2f2;
+    }
+    #content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <div id="content">
+    <h1>Days Since March 31, 2020</h1>
+    <p id="daysPassed">Calculating...</p>
+  </div>
+</div>
+
+<script>
+  // Define the target date (March 31, 2020)
+  const targetDate = new Date("2020-03-31");
+
+  // Get the current date and time
+  const currentDate = new Date();
+
+  // Calculate the time difference between the current date and the target date
+  const timeDifference = currentDate - targetDate;
+
+  // Calculate the number of days passed
+  const daysPassed = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+  // Update the text content of the element with id "daysPassed"
+  document.getElementById("daysPassed").textContent = `It has been ${daysPassed} days since March 31, 2020.`;
+</script>
+
+</body>
+</html>
