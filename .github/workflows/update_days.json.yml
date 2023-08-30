@@ -1,0 +1,30 @@
+name: Update Days Since March 31, 2020 in JSON
+
+on:
+  schedule:
+    # Runs at 00:01 UTC
+    - cron: '1 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-days-json:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      # Calculate the days and update the JSON file
+      - name: Update days in JSON file
+        run: |
+          DAYS=$(( ( $(date -u +%s) - $(date -ud '2020-03-31' +%s) ) / 86400 ))
+          sed -i "s/\"PLACEHOLDER\"/\"$DAYS\"/g" days_since.json
+      
+      # Commit and push the changes
+      - name: Commit and push
+        run: |
+          git config --global user.name 'Andreas Fritzler'
+          git config --global user.email 'afritzler@skiff.com'
+          git add days_since.json
+          git commit -m "Update days count in JSON"
+          git push
